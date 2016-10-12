@@ -1,9 +1,54 @@
 # Machine Learning Demos
-Machine learning demos with Mallet, Deeplearning4j and Surus
+The content of this repository allows to run three machine learning demos. 
 
 1. Clone this repo to a directory of your choice
 2. Create the docker images for the demos
 3. Run the demos
+
+## Demo Quick Facts
+
+- The three demos cover different areas of machine learning
+  * Natural Language Processing
+  * Pattern Recognition
+  * Outlier Detection
+- Each demo shows a different Java toolkit
+  * [Mallet](http://mallet.cs.umass.edu/) 
+  * [Deeplearning4j](https://deeplearning4j.org/) 
+  * [Surus](https://github.com/Netflix/Surus)
+- Everything is open and freely available
+  * Machine learning toolkits
+  * Data for examples
+  * Related publications
+
+## Repository Organisation
+
+For each demo a different docker image setup is provided and the content of the repository is organized accordingly.
+
+```
+ +-- README.md (the file you are now reading)
+ |
+ +-- image_javadev
+ |      +-- Dockerfile (parent dockerfile for java development)
+ |
+ +-- image_mallet
+ |      +-- Dockerfile (setup for Mallet toolkit)
+ |      +-- data
+ |            +-- rt-polarity.* files (movie review data for sentiment analysis example)
+ |
+ +-- image_deeplearning4j
+ |      +-- Dockerfile (setup for deeplearning4j toolkit)
+ |      +-- data
+ |      |     +-- nist files (handwritten digits)
+ |      +-- models
+ |
+ +-- image_surus
+
+```
+
+
+
+This has the benefit that the demos are independent of each other and allows for simple cleanup once the demos are no longer used.
+
 
 ## Create Docker Images
 
