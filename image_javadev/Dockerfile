@@ -1,6 +1,7 @@
 FROM java:openjdk-8
 
-MAINTAINER Matthias Zimmermann <matthias.zimmermann@bsi-software.com>
+# dockerfile source:
+# https://github.com/dockunit/docker-prebuilt/blob/master/java-maven-ant-gradle/openjdk-8-jdk/Dockerfile
 
 ENV MAVEN_VERSION 3.3.3
 
