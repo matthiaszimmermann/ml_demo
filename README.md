@@ -58,8 +58,8 @@ ls -l models/*
 
 Evaluate a model. First on 10,000 digits then on a single image
 ```
-java -cp dl4j-demo.jar org.ece16.dl4j.LeNetMnistTester models/lenet.dl4j.epoch10.model
-java -cp dl4j-demo.jar org.ece16.dl4j.LeNetMnistTester models/lenet.dl4j.epoch10.model 115
+java -cp /usr/share/dl4j-demo/dl4j-demo.jar org.ece16.dl4j.LeNetMnistTester models/lenet.dl4j.epoch10.model
+java -cp /usr/share/dl4j-demo/dl4j-demo.jar dl4j-demo.jar org.ece16.dl4j.LeNetMnistTester models/lenet.dl4j.epoch10.model 115
 ```
 
 You can also train your own net
