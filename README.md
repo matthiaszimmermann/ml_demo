@@ -40,15 +40,15 @@ For each demo a different docker image setup is provided and the content of the 
  |      +-- data
  |      |     +-- nist files (handwritten digits)
  |      +-- models
- |
+ |      |     +-- pretrained lenet5 deep neural net models at 1, 5, and 10 epochs of the training
+ |      +-- dl4j-demo
+ |            +-- ... maven project with demo code: LeNetMnistTrainer.java and LeNetMnistTester.java
+ |      
  +-- image_surus
 
 ```
 
-
-
 This has the benefit that the demos are independent of each other and allows for simple cleanup once the demos are no longer used.
-
 
 ## Create Docker Images
 
