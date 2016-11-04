@@ -5,17 +5,17 @@ import java.util.List;
 
 /** 
  *  
- * @author wilsonact
+ * 
  * original source: https://github.com/wilsonact/LOF-java/blob/master/DataNode.java
  * 
  */  
 public class DataNode {  
 	private String nodeName;
 	private String nodeLabel;
-	private double[] dimensioin;
+	private double[] dimension;
 
 	private double kDistance; // k-??  
-	private List<DataNode> kNeighbor = new ArrayList<DataNode>();// k-??  
+	private List<DataNode> kNeighbor = new ArrayList<DataNode>(); // k-??  
 	private double distance; // ???????????  
 	private double reachDensity;// ????  
 	private double reachDis;// ????  
@@ -26,20 +26,24 @@ public class DataNode {
 	}  
 
 	public DataNode(DataNode node) {
-		this(node.nodeName, node.nodeLabel, node.dimensioin);
+		this(node.nodeName, node.nodeLabel, node.dimension);
 	}
 
-	public DataNode(String nodeName, String nodeLabel, double[] dimensioin) {  
+	public DataNode(String nodeName, String nodeLabel, double[] dimension) {  
 		this.nodeName = nodeName;  
 		this.nodeLabel = nodeLabel;  
-		this.dimensioin = dimensioin;  
+		this.dimension = dimension;  
 	}  
 
+	/**
+	 * @param node
+	 * @return Euclidian distance between the two nodes
+	 */
 	public double distance(DataNode node) {  
 		double dis = 0.0;  
 
-		for (int i = 0; i < dimensioin.length; i++) {  
-			dis += Math.pow(dimensioin[i] - node.dimensioin[i], 2);  
+		for (int i = 0; i < dimension.length; i++) {  
+			dis += Math.pow(dimension[i] - node.dimension[i], 2);  
 		}
 
 		return Math.pow(dis, 0.5);  
@@ -62,11 +66,11 @@ public class DataNode {
 	}  
 
 	public double[] getDimensioin() {  
-		return dimensioin;  
+		return dimension;  
 	}  
 
 	public void setDimensioin(double[] dimensioin) {  
-		this.dimensioin = dimensioin;  
+		this.dimension = dimensioin;  
 	}
 
 	public double getkDistance() {  

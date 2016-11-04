@@ -25,10 +25,9 @@ public class LocalOutlierFactor {
 	 */  
 	public class DistComparator implements Comparator<DataNode> {  
 		public int compare(DataNode A, DataNode B) {  
-			//return A.getDistance() - B.getDistance() < 0 ? -1 : 1;  
-			if((A.getDistance()-B.getDistance())<0)     
+			if((A.getDistance() - B.getDistance()) < 0)     
 				return -1;    
-			else if((A.getDistance()-B.getDistance())>0)    
+			else if((A.getDistance() - B.getDistance()) > 0)    
 				return 1;    
 			else return 0;    
 		}  
@@ -39,37 +38,29 @@ public class LocalOutlierFactor {
 	 */  
 	public class LofComparator implements Comparator<DataNode> {  
 		public int compare(DataNode A, DataNode B) {  
-			//return A.getLof() - B.getLof() < 0 ? 1 : -1;  
-			if((A.getLof()-B.getLof())<0)     
+			if((A.getLof() - B.getLof()) < 0)     
 				return 1;    
-			else if((A.getLof()-B.getLof())>0)    
+			else if((A.getLof() - B.getLof()) > 0)    
 				return -1;    
 			else return 0;    
 		}  
 	}    
 
 	/**
-	 * Computes LOF values for all nodes and retuns a sorted set of the nodes.
+	 * Computes LOF values for all nodes and returns a sorted set of the nodes.
 	 */
-	// 1.æ‰¾åˆ°ç»™å®šç‚¹ä¸Žå…¶ä»–ç‚¹çš„æ¬§å‡ é‡Œå¾—è·�ç¦»  
-	// 2.å¯¹æ¬§å‡ é‡Œå¾—è·�ç¦»è¿›è¡ŒæŽ’åº�ï¼Œæ‰¾åˆ°å‰�5ä½�çš„ç‚¹ï¼Œå¹¶å�Œæ—¶è®°ä¸‹kè·�ç¦»  
-	// 3.è®¡ç®—æ¯�ä¸ªç‚¹çš„å�¯è¾¾å¯†åº¦  
-	// 4.è®¡ç®—æ¯�ä¸ªç‚¹çš„å±€éƒ¨ç¦»ç¾¤ç‚¹å› å­�  
-	// 5.å¯¹æ¯�ä¸ªç‚¹çš„å±€éƒ¨ç¦»ç¾¤ç‚¹å› å­�è¿›è¡ŒæŽ’åº�ï¼Œè¾“å‡ºã€‚  
 	public List<DataNode> getOutlierNodes(List<DataNode> allNodes) {  
 
 		List<DataNode> kdAndKnList = getKDAndKN(allNodes);  
 		calReachDis(kdAndKnList);  
 		calReachDensity(kdAndKnList);  
 		calLof(kdAndKnList);  
-		//é™�åº�æŽ’åº�  
 		Collections.sort(kdAndKnList, new LofComparator());  
 
 		return kdAndKnList;  
 	}  
 
 	/** 
-	 * è®¡ç®—æ¯�ä¸ªç‚¹çš„å±€éƒ¨ç¦»ç¾¤ç‚¹å› å­� 
 	 * @param kdAndKnList 
 	 */  
 	private void calLof(List<DataNode> kdAndKnList) {  
@@ -86,7 +77,6 @@ public class LocalOutlierFactor {
 	}  
 
 	/** 
-	 * è®¡ç®—æ¯�ä¸ªç‚¹çš„å�¯è¾¾è·�ç¦» 
 	 * @param kdAndKnList 
 	 */  
 	private void calReachDensity(List<DataNode> kdAndKnList) {  
@@ -103,14 +93,13 @@ public class LocalOutlierFactor {
 	}
 
 	/** 
-	 * è®¡ç®—æ¯�ä¸ªç‚¹çš„å�¯è¾¾å¯†åº¦,reachdis(p,o)=max{ k-distance(o),d(p,o)} 
+	 * reachdis(p,o)=max{ k-distance(o), d(p,o)} 
 	 * @param kdAndKnList 
 	 */  
 	private void calReachDis(List<DataNode> kdAndKnList) {  
 		for (DataNode node : kdAndKnList) {  
 			List<DataNode> tempNodes = node.getkNeighbor();  
 			for (DataNode tempNode : tempNodes) {  
-				//èŽ·å�–tempNodeç‚¹çš„k-è·�ç¦»  
 				double kDis = getKDis(tempNode.getNodeName(), kdAndKnList);  
 				//reachdis(p,o)=max{ k-distance(o),d(p,o)}  
 				if (kDis < tempNode.getDistance()) {  
@@ -159,13 +148,6 @@ public class LocalOutlierFactor {
 	}  
 
 	/** 
-	 * è®¡ç®—ç»™å®šç‚¹NodeAä¸Žå…¶ä»–ç‚¹NodeBçš„æ¬§å‡ é‡Œå¾—è·�ç¦»ï¼ˆdistanceï¼‰,å¹¶æ‰¾åˆ°NodeAç‚¹çš„å‰�5ä½�NodeBï¼Œç„¶å�Žè®°å½•åˆ°NodeAçš„k-é¢†åŸŸï¼ˆkNeighborï¼‰å�˜é‡�ã€‚ 
-	 * å�Œæ—¶æ‰¾åˆ°NodeAçš„kè·�ç¦»ï¼Œç„¶å�Žè®°å½•åˆ°NodeAçš„k-è·�ç¦»ï¼ˆkDistanceï¼‰å�˜é‡�ä¸­ã€‚ 
-	 * å¤„ç�†æ­¥éª¤å¦‚ä¸‹ï¼š 
-	 * 1,è®¡ç®—ç»™å®šç‚¹NodeAä¸Žå…¶ä»–ç‚¹NodeBçš„æ¬§å‡ é‡Œå¾—è·�ç¦»ï¼Œå¹¶è®°å½•åœ¨NodeBç‚¹çš„distanceå�˜é‡�ä¸­ã€‚ 
-	 * 2,å¯¹æ‰€æœ‰NodeBç‚¹ä¸­çš„distanceè¿›è¡Œå�‡åº�æŽ’åº�ã€‚ 
-	 * 3,æ‰¾åˆ°NodeBç‚¹çš„å‰�5ä½�çš„æ¬§å‡ é‡Œå¾—è·�ç¦»ç‚¹ï¼Œå¹¶è®°å½•åˆ°åˆ°NodeAçš„kNeighborå�˜é‡�ä¸­ã€‚ 
-	 * 4,æ‰¾åˆ°NodeBç‚¹çš„ç¬¬5ä½�è·�ç¦»ï¼Œå¹¶è®°å½•åˆ°NodeAç‚¹çš„kDistanceå�˜é‡�ä¸­ã€‚ 
 	 * @param allNodes 
 	 * @return List<Node> 
 	 */  
@@ -175,26 +157,21 @@ public class LocalOutlierFactor {
 			List<DataNode> tempNodeList = new ArrayList<DataNode>();  
 			DataNode nodeA = new DataNode(allNodes.get(i));  
 
-			//1,æ‰¾åˆ°ç»™å®šç‚¹NodeAä¸Žå…¶ä»–ç‚¹NodeBçš„æ¬§å‡ é‡Œå¾—è·�ç¦»ï¼Œå¹¶è®°å½•åœ¨NodeBç‚¹çš„distanceå�˜é‡�ä¸­ã€‚  
 			for (int j = 0; j < allNodes.size(); j++) {  
 				DataNode nodeB = new DataNode(allNodes.get(j));  
-				//è®¡ç®—NodeAä¸ŽNodeBçš„æ¬§å‡ é‡Œå¾—è·�ç¦»(distance)  
-				// double tempDis = getDis(nodeA, nodeB);
 				double tempDis = nodeA.distance(nodeB);
 				nodeB.setDistance(tempDis);  
 				tempNodeList.add(nodeB);  
 			}  
 
-			//2,å¯¹æ‰€æœ‰NodeBç‚¹ä¸­çš„æ¬§å‡ é‡Œå¾—è·�ç¦»ï¼ˆdistanceï¼‰è¿›è¡Œå�‡åº�æŽ’åº�ã€‚  
 			Collections.sort(tempNodeList, new DistComparator());  
 			for (int k = 1; k < INT_K; k++) {  
-				//3,æ‰¾åˆ°NodeBç‚¹çš„å‰�5ä½�çš„æ¬§å‡ é‡Œå¾—è·�ç¦»ç‚¹ï¼Œå¹¶è®°å½•åˆ°åˆ°NodeAçš„kNeighborå�˜é‡�ä¸­ã€‚  
 				nodeA.getkNeighbor().add(tempNodeList.get(k));  
 				if (k == INT_K - 1) {  
-					//4,æ‰¾åˆ°NodeBç‚¹çš„ç¬¬5ä½�è·�ç¦»ï¼Œå¹¶è®°å½•åˆ°NodeAç‚¹çš„kDistanceå�˜é‡�ä¸­ã€‚  
 					nodeA.setkDistance(tempNodeList.get(k).getDistance());  
 				}  
-			}  
+			}
+			
 			kdAndKnList.add(nodeA);  
 		}  
 

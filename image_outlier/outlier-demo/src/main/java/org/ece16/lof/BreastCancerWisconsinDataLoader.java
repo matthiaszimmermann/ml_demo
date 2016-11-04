@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Loads Wisconsin breast cancer datat into format suitable for LofTester class. 
+ * Main method for LofTester: getDataNodes.
+ */
 public class BreastCancerWisconsinDataLoader {
 	public static final String DEFAULT_DATA_PATH = "data/wdbc.data";
 	public static final double threshold = 0.1;
