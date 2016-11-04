@@ -2,6 +2,9 @@ FROM javadev:latest
 
 MAINTAINER Matthias Zimmermann <matthias.zimmermann@bsi-software.com>
 
+# workaround to ensure access to internat from within container
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
 ENV DEMO_HOME /home/demo
 ENV DEMO_DATA $DEMO_HOME/data
 ENV DEMO_MODELS $DEMO_HOME/models

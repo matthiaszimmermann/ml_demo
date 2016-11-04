@@ -16,13 +16,11 @@ public class RpcaTester {
   
   public boolean MatrixApproximatelyEquals(double[][] X, double[][] Y, double epsilon) {
 	  boolean testOutput = true;
-	  int printCnt = 0;
 	  
 	  for (int j = 0; j < X[0].length; j++) {
 		  for (int i = 0; i < X.length; i++) {
 			  if (Math.abs(X[i][j] - Y[i][j]) > epsilon) {
 				  System.out.println("("+i+","+j+") Left: "+X[i][j] + " Right: "+Y[i][j]);
-				  printCnt++;
 				  testOutput = false;
 			  }
 		  }

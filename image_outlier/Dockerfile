@@ -2,6 +2,9 @@ FROM javadev:latest
 
 MAINTAINER Matthias Zimmermann <matthias.zimmermann@bsi-software.com>
 
+# workaround to ensure access to internat from within container
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
 ENV DEMO_HOME /home/demo
 ENV DEMO_DATA $DEMO_HOME/data
 
@@ -23,13 +26,16 @@ RUN mkdir -p $OUTLIER_DEMO_HOME
 COPY outlier-demo $OUTLIER_DEMO_HOME
 
 RUN cd $OUTLIER_DEMO_HOME \
-    && mvn clean package \
-	&& ln -s target/outlier-demo-$OUTLIER_DEMO_VERSION.jar $OUTLIER_DEMO_JAR
+    && mvn clean package
+    
+RUN cd $OUTLIER_DEMO_HOME \
+	&& ln -s target/original-outlier-demo-$OUTLIER_DEMO_VERSION.jar $OUTLIER_DEMO_JAR
 	
 #--- finish up ---------------------------------------------------------------#
 
 WORKDIR $DEMO_HOME
 
 RUN echo "# try the outlier demo with the example below" > README.txt \
-    && echo "java -cp $OUTLIER_DEMO_HOME/$OUTLIER_DEMO_JAR org.ece16.lof.LofTester data/wdbc.data 2.4" >> README.txt \
-    && echo "java -cp $OUTLIER_DEMO_HOME/$OUTLIER_DEMO_JAR org.ece16.lof.LofTester data/wdbc.data 2.4 40" >> README.txt
+    && echo "java -cp $OUTLIER_DEMO_HOME/$OUTLIER_DEMO_JAR org.ece16.lof.LofTester data/wdbc.data 1" >> README.txt \
+    && echo "java -cp $OUTLIER_DEMO_HOME/$OUTLIER_DEMO_JAR org.ece16.lof.LofTester data/wdbc.data 2" >> README.txt \
+    && echo "java -cp $OUTLIER_DEMO_HOME/$OUTLIER_DEMO_JAR org.ece16.lof.LofTester data/wdbc.data 2.5" >> README.txt

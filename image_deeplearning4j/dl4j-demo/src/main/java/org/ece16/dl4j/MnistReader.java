@@ -24,21 +24,21 @@ public class MnistReader {
 			System.err.println("usage: java org.ece16.dl4j.MnistReader label-file image-file [image-number]");
 			System.exit(1);
 		}
-		
+
 		String file_label = arg[0];
 		String file_image = arg[1];
-		
+
 		int [] labels = MnistReader.getLabels(file_label);
 		List<int[][]> images = MnistReader.getImages(file_image);
-		
+
 		if(labels.length != images.size()) {
 			throw new RuntimeException("Number of labels and images don't match");
 		}
-		
+
 		if(images.get(0).length != 28) {
 			throw new RuntimeException("Number of pixel is not 28");
 		}
-		
+
 		if(images.get(0)[0].length != 28) {
 			throw new RuntimeException("Number of pixel columms is not 28");
 		}
@@ -52,13 +52,13 @@ public class MnistReader {
 		else {
 			int image_number = Integer.parseInt(arg[2]);
 			Scanner scanner = new Scanner(System.in);
-			
+
 			while(image_number >= 0 && image_number < labels.length) {
 				printf("+---[ID:%05d, LABEL:%d]------+\n", image_number, labels[image_number]);
 				printf("%s", MnistReader.renderImage(images.get(image_number)));
 				printf("+----------------------------+\n");
 				printf("next id: ");
-				
+
 				if(scanner.hasNextInt()) {
 					image_number = scanner.nextInt();
 				}
@@ -66,9 +66,11 @@ public class MnistReader {
 					image_number = -1;
 				}
 			}
+
+			scanner.close();
 		}
 	}
-	
+
 	public static int[] getLabels(String infile) {
 		ByteBuffer bb = loadFileToByteBuffer(infile);
 
@@ -103,21 +105,21 @@ public class MnistReader {
 
 	private static int[][] readImage(int numRows, int numCols, ByteBuffer bb) {
 		int[][] image = new int[numRows][];
-		
+
 		for (int row = 0; row < numRows; row++) {
 			image[row] = readRow(numCols, bb);
 		}
-		
+
 		return image;
 	}
 
 	private static int[] readRow(int numCols, ByteBuffer bb) {
 		int[] row = new int[numCols];
-		
+
 		for (int col = 0; col < numCols; ++col) {
 			row[col] = bb.get() & 0xFF; // To unsigned
 		}
-		
+
 		return row;
 	}
 
@@ -131,11 +133,11 @@ public class MnistReader {
 			default:
 				throw new RuntimeException(
 						String.format("Expected magic number %d, found %d", expectedMagicNumber, magicNumber)
-					);
+						);
 			}
 		}
 	}
-	
+
 	private static void printf(String format, Object... args) {
 		System.out.printf(format, args);
 	}
@@ -153,14 +155,14 @@ public class MnistReader {
 			chan.read(bb);
 			bb.flip();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			
+
 			for (int i = 0; i < fileSize; i++) {
 				baos.write(bb.get());
 			}
-			
+
 			chan.close();
 			f.close();
-			
+
 			return baos.toByteArray();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -172,7 +174,7 @@ public class MnistReader {
 
 		for (int row = 0; row < image.length; row++) {
 			sb.append("|");
-			
+
 			for (int col = 0; col < image[row].length; col++) {
 				int pixelVal = image[row][col];
 				if (pixelVal == 0) {
@@ -188,20 +190,10 @@ public class MnistReader {
 					sb.append("X");
 				}
 			}
-			
+
 			sb.append("|\n");
 		}
 
-		return sb.toString();
-	}
-
-	private static String repeat(String s, int n) {
-		StringBuilder sb = new StringBuilder();
-		
-		for (int i = 0; i < n; i++) {
-			sb.append(s);
-		}
-		
 		return sb.toString();
 	}
 }

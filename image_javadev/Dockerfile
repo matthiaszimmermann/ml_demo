@@ -1,7 +1,16 @@
 FROM java:openjdk-8
 
-# dockerfile source:
+MAINTAINER Matthias Zimmermann <matthias.zimmermann@bsi-software.com>
+
+# workaround to ensure access to internat from within container
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+
+# dockerfile original source:
 # https://github.com/dockunit/docker-prebuilt/blob/master/java-maven-ant-gradle/openjdk-8-jdk/Dockerfile
+
+#--- maven installation ------------------------------------------------------#
 
 ENV MAVEN_VERSION 3.3.3
 
@@ -10,6 +19,14 @@ RUN curl -fsSL http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binar
   && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
 ENV MAVEN_HOME /usr/share/maven
+
+# create a java hello world to download mvn standard packages into javadev image
+RUN cd \
+	&& mvn archetype:generate -DgroupId=com.github.matthiaszimmermann.helloworld -DartifactId=helloworld -DinteractiveMode=false \
+	&& cd helloworld \
+	&& mvn clean install
+
+#--- gradle installation -----------------------------------------------------#
 
 ENV GRADLE_VERSION 2.8
 ENV GRADLE_HASH fe801ce2166e6c5b48b3e7ba81277c41
@@ -22,6 +39,8 @@ RUN wget https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin
 ENV GRADLE_HOME /usr/src/gradle
 ENV PATH $PATH:$GRADLE_HOME/bin
 
+#--- ant installation --------------------------------------------------------#
+
 ENV ANT_VERSION 1.9.4
 RUN cd && \
     wget -q http://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
@@ -32,4 +51,3 @@ ENV ANT_HOME /opt/ant
 
 ENV PATH ${PATH}:/opt/ant/bin
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64

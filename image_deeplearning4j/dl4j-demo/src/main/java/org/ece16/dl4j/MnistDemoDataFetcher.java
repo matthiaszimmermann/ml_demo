@@ -14,6 +14,8 @@ import org.nd4j.linalg.factory.Nd4j;
  */
 public class MnistDemoDataFetcher extends MnistDataFetcher {
 	
+	private static final long serialVersionUID = 1L;
+
 	public MnistDemoDataFetcher(boolean binarize, boolean train, boolean shuffle, int seed) throws IOException {
 		super(binarize, train, shuffle, seed);
 	}
