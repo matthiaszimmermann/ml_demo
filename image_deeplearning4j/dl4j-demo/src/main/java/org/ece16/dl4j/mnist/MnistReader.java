@@ -1,4 +1,4 @@
-package org.ece16.dl4j;
+package org.ece16.dl4j.mnist;
 
 import java.io.ByteArrayOutputStream;
 import java.io.RandomAccessFile;
