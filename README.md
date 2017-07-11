@@ -41,12 +41,14 @@ For each demo a different docker image setup is provided and the content of the 
  |      +-- Dockerfile (setup for deeplearning4j toolkit)
  |      +-- data
  |      |     +-- nist files (handwritten digits)
+ |      |     +-- wdbc data (diagnostic breast cancer)
  |      +-- models
  |      |     +-- pretrained lenet5 deep neural net models at 1, 5, and 10 epochs of the training
+ |      ¦     +-- autoencoder for breast cancer detection (unsupervised learning)
  |      +-- papers
  |      |     +-- deep neural network papers: lenet, imagenet, facenet
  |      +-- dl4j-demo
- |            +-- ... maven project with demo code: LeNetMnistTrainer.java and LeNetMnistTester.java
+ |            +-- ... maven project with demo code: LeNetMnistTrainer.java, LeNetMnistTester.java and WDBCAutoencoder.java
  |      
  +-- image_outlier
         +-- Dockerfile (setup for outlier detection)
