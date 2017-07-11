@@ -6,14 +6,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
-import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.FeedForwardLayer;
+import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -44,8 +46,13 @@ public class WDBCAutoencoder {
 	}
 
 	/**
-	 * Builds and trains an auto-encoder for begning WDBC data.
-	 * The auto-encoder is then used as an anomaly detector to find cancer cases.
+	 * Builds and trains an auto-encoder for benign WDBC data.
+	 * The auto-encoder is used as an anomaly detector 
+	 * to find non-benign cases (=cancer).
+	 * 
+	 * WARNING: The original data is built for supervised learning. 
+	 * Using this data for unsupervised learning is 
+	 * for demonstration purposes only!
 	 */
 	public static void main(String[] args) {
 		String dataFile = args[0];
@@ -55,10 +62,11 @@ public class WDBCAutoencoder {
 		int intermediateDimensions = 14;
 		int coreDimensions = 8;
 		int epochs = 5;
+		boolean detailedFalse = false;
 
 		WDBCAutoencoder wdbc = new WDBCAutoencoder(dataFile, trainingPercentage);
 		wdbc.train(intermediateDimensions, coreDimensions, epochs);
-		wdbc.printTopology();
+		wdbc.printTopology(detailedFalse);
 
 		// evaluate auto-encoder
 		double reconstructionErrorThreshold = 20_000;
@@ -67,13 +75,19 @@ public class WDBCAutoencoder {
 		wdbc.evaluate();
 		wdbc.getResult(reconstructionErrorThreshold, debugTrue);
 
-		// wdbc.parameterGridSearch();
+		boolean doGridSearch = false;
+		if(doGridSearch) {
+			wdbc.parameterGridSearch();
+		}
 	}
 
 	/**
 	 * Creates and trains an auto-encoder using the provided hyper-parameters.
 	 */
 	private void train(int intermediateDimensions, int coreDimensions, int epochs) {
+		System.out.println();
+		System.out.println("train auto-encoder ["+intermediateDimensions+", " + coreDimensions + "]");
+
 		boolean addListenerFalse = false;
 		createEncoder(intermediateDimensions, coreDimensions);
 		train(epochs, addListenerFalse);
@@ -195,18 +209,22 @@ public class WDBCAutoencoder {
 				.learningRate(0.05)
 				.regularization(true).l2(0.0001)
 				.list()
+				// 1st compression layer: input -> intermediate dimensionality
 				.layer(0, new DenseLayer.Builder()
 						.nIn(inputDimensions)
 						.nOut(intermediateDimensions)
 						.build())
+				// 2nd compression layer: intermediate -> core dimensionality
 				.layer(1, new DenseLayer.Builder()
 						.nIn(intermediateDimensions)
 						.nOut(coreDimensions)
 						.build())
+				// 1st expansion layer: core -> intermediate dimensionality
 				.layer(2, new DenseLayer.Builder()
 						.nIn(coreDimensions)
 						.nOut(intermediateDimensions)
 						.build())
+				// 2nd expansion layer: intermediate -> output (=input) dimensionality
 				.layer(3, new OutputLayer.Builder()
 						.nIn(intermediateDimensions)
 						.nOut(outputDimensions)
@@ -266,12 +284,17 @@ public class WDBCAutoencoder {
 
 		return bestResult;
 	}
-	
-	private void printTopology() {
+
+	private void printTopology(boolean detailed) {
 		System.out.println("\nauto-encoder topology:");
-		
-		for(Layer layer: net.getLayers()) {
-			System.out.println(String.format("%s", layer.toString()));
+
+		if(detailed) {
+			for(org.deeplearning4j.nn.api.Layer layer: net.getLayers()) {
+				System.out.println(String.format("%s", layer.toString()));
+			}
+		}
+		else {
+			System.out.println(this.summary());
 		}
 	}
 
@@ -327,4 +350,59 @@ public class WDBCAutoencoder {
 		return "" + fmeasure + " max-error " + errorThreshold + " precision " + precision + " recall " + recall +
 				" [true-positive " + truePositive +" false-positive " + falsePositive + " false-negative " + falseNegative + " true-negative " + trueNegative + "]";
 	}
+
+	/**
+	 * method copied/adapted from
+	 * https://github.com/deeplearning4j/deeplearning4j/blob/master/deeplearning4j-nn/src/main/java/org/deeplearning4j/nn/graph/ComputationGraph.java
+	 */
+	public String summary() {
+		String ret = "\n";
+		ret += StringUtils.repeat("=", 70);
+		ret += "\n";
+		ret += String.format("%-40s%-15s%-15s\n", "VertexName (VertexType)", "nIn -> nOut", "Layer Params");
+		ret += StringUtils.repeat("=", 70);
+		ret += "\n";
+		int totalParams = 0;
+
+		for (int currentLayerIdx = 0; currentLayerIdx < net.getnLayers(); currentLayerIdx++) {
+			Layer current = net.getLayer(currentLayerIdx).conf().getLayer();
+			int layerParams = net.getLayer(currentLayerIdx).numParams();
+
+			String name = String.valueOf(currentLayerIdx);
+			String[] classNameArr = current.getClass().toString().split("\\.");
+			String className = classNameArr[classNameArr.length - 1];
+
+			String paramCount = "-";
+			String in = "-";
+			String out = "-";
+			String paramShape = "-";
+			if (current instanceof FeedForwardLayer) {
+				FeedForwardLayer currentLayer = (FeedForwardLayer)current;
+				classNameArr = currentLayer.getClass().getName().split("\\.");
+				className = classNameArr[classNameArr.length - 1];
+				paramCount = String.valueOf(layerParams);
+				totalParams += layerParams;
+
+				if (layerParams > 0) {
+					paramShape = "";
+					in = String.valueOf(currentLayer.getNIn());
+					out = String.valueOf(currentLayer.getNOut());
+					if(paramShape.lastIndexOf(",") >= 0) {
+						paramShape = paramShape.subSequence(0, paramShape.lastIndexOf(",")).toString();
+					}
+				}
+			}
+
+			ret += String.format("%-40s%-15s%-15s", name + " (" + className + ")", in + " -> " + out, paramCount);
+			ret += "\n";
+		}
+
+		ret += StringUtils.repeat("-", 70);
+		ret += String.format("\n%30s %d", "Total Parameters: ", totalParams);
+		ret += "\n";
+		ret += StringUtils.repeat("=", 70);
+		ret += "\n";
+
+		return ret;
+	}	
 }
